@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.hardware.camera2.CameraMetadata
 import android.hardware.camera2.CaptureRequest
 import android.net.Uri
@@ -63,6 +64,8 @@ enum class CameraMode(val extensionMode: Int, val uiName: Int) {
 }
 
 class CamConfig(private val mActivity: MainActivity) {
+
+    private fun getString(@StringRes id: Int) = mActivity.getString(id)
 
     enum class GridType {
         NONE,
@@ -124,7 +127,7 @@ class CamConfig(private val mActivity: MainActivity) {
 
             const val EMPHASIS_ON_QUALITY = true
 
-            const val FOCUS_TIMEOUT = "5s"
+            const val FOCUS_TIMEOUT = 1
 
             const val INCLUDE_AUDIO = true
 
@@ -353,7 +356,7 @@ class CamConfig(private val mActivity: MainActivity) {
     var focusTimeout = 5L
         set(value) {
             val option = if (value == 0L) {
-                "Off"
+                getString(R.string.off)
             } else {
                 "${value}s"
             }
@@ -607,8 +610,6 @@ class CamConfig(private val mActivity: MainActivity) {
             mActivity.settingsDialog.selfIllumination()
         }
 
-    private fun getString(@StringRes id: Int) = mActivity.getString(id)
-
     fun setQRScanningFor(format: String, selected: Boolean) {
 
         val formatSRep = "${SettingValues.Key.SCAN}_$format"
@@ -699,7 +700,7 @@ class CamConfig(private val mActivity: MainActivity) {
         }
 
         if (!commonPref.contains(SettingValues.Key.FOCUS_TIMEOUT)) {
-            editor.putString(SettingValues.Key.FOCUS_TIMEOUT, SettingValues.Default.FOCUS_TIMEOUT)
+            editor.putString(SettingValues.Key.FOCUS_TIMEOUT, mActivity.resources.getStringArray(R.array.time_options)[SettingValues.Default.FOCUS_TIMEOUT])
         }
 
         if (!commonPref.contains(SettingValues.Key.EMPHASIS_ON_QUALITY)) {
@@ -765,7 +766,7 @@ class CamConfig(private val mActivity: MainActivity) {
 
         mActivity.settingsDialog.updateGridToggleUI()
 
-        commonPref.getString(SettingValues.Key.FOCUS_TIMEOUT, SettingValues.Default.FOCUS_TIMEOUT)
+        commonPref.getString(SettingValues.Key.FOCUS_TIMEOUT, mActivity.resources.getStringArray(R.array.time_options)[SettingValues.Default.FOCUS_TIMEOUT])
             ?.let {
                 mActivity.settingsDialog.updateFocusTimeout(it)
             }
